@@ -12,9 +12,9 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-_JsonType = JSON().with_variant(JSONB(), "postgresql")
-
 from app.database import Base
+
+_JsonType = JSON().with_variant(JSONB(), "postgresql")
 
 if TYPE_CHECKING:
     from app.models.user import User
