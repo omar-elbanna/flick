@@ -22,14 +22,13 @@ class Base(AsyncAttrs, DeclarativeBase):
     type_annotation_map: dict[Any, Any] = {}
 
 
-engine = create_async_engine(
-    settings.DATABASE_URL,
-    echo=False,
-    pool_pre_ping=True,
-    pool_size=10,
-    max_overflow=20,
-    future=True,
-)
+# Pool-size kwargs are PostgreSQL-only; SQLite (used in tests) rejects them.
+_is_sqlite = settings.DATABASE_URL.startswith("sqlite")
+_engine_kwargs: dict[str, object] = {"echo": False, "future": True}
+if not _is_sqlite:
+    _engine_kwargs.update({"pool_pre_ping": True, "pool_size": 10, "max_overflow": 20})
+
+engine = create_async_engine(settings.DATABASE_URL, **_engine_kwargs)
 
 AsyncSessionLocal = async_sessionmaker(
     engine,
