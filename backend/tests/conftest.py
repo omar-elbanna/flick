@@ -96,19 +96,16 @@ async def client(
     monkeypatch.setattr(db_module, "engine", db_engine, raising=True)
     monkeypatch.setattr(db_module, "AsyncSessionLocal", test_sessionmaker, raising=True)
 
-    # Patch out external services so tests don't hit the network.
+    # Patch out external services so tests don't hit the network. Patch the
+    # imported-into-module reference (where it's USED) not the source, otherwise
+    # the route handlers still see the real function.
     with (
-        patch("app.utils.tmdb_client.get_movie_detail", new_callable=AsyncMock) as tmdb_detail,
-        patch("app.utils.tmdb_client.search_movies", new_callable=AsyncMock) as tmdb_search,
-        patch("app.utils.tmdb_client.get_trending", new_callable=AsyncMock) as tmdb_trending,
-        patch("app.utils.tmdb_client.get_genres", new_callable=AsyncMock) as tmdb_genres,
-        patch("app.utils.openai_client.call_with_retry", new_callable=AsyncMock) as openai_call,
-        patch("app.routers.movies.get_movie_detail", new=tmdb_detail),
-        patch("app.routers.movies.search_movies", new=tmdb_search),
-        patch("app.routers.movies.get_trending", new=tmdb_trending),
-        patch("app.routers.movies.get_genres", new=tmdb_genres),
-        patch("app.services.movie_service.get_movie_detail", new=tmdb_detail),
-        patch("app.services.recommendation_service.call_with_retry", new=openai_call),
+        patch("app.services.movie_service.get_movie_detail", new_callable=AsyncMock) as tmdb_detail,
+        patch("app.routers.movies.search_movies", new_callable=AsyncMock) as tmdb_search,
+        patch("app.routers.movies.get_trending", new_callable=AsyncMock) as tmdb_trending,
+        patch("app.routers.movies.get_genres", new_callable=AsyncMock) as tmdb_genres,
+        patch("app.services.recommendation_service.call_with_retry", new_callable=AsyncMock) as openai_call,
+        patch("app.services.recommendation_service.search_movies", new_callable=AsyncMock) as reco_search,
         patch("app.utils.redis_client.get_redis", new_callable=AsyncMock) as redis_mock,
         patch("app.utils.redis_client.cache_get", new_callable=AsyncMock, return_value=None),
         patch("app.utils.redis_client.cache_set", new_callable=AsyncMock, return_value=None),
@@ -145,10 +142,16 @@ async def client(
             }
 
         tmdb_detail.side_effect = lambda tmdb_id: make_tmdb(int(tmdb_id))
+        reco_search.return_value = {
+            "page": 1,
+            "results": [],
+            "total_pages": 0,
+            "total_results": 0,
+        }
 
         openai_call.return_value = {
             "recommendations": [
-                {"tmdb_id": 1000 + i, "title": f"Reco {i}", "reasoning": "test"}
+                {"title": f"Reco {i}", "year": 2020 + i, "reasoning": "test"}
                 for i in range(5)
             ]
         }
