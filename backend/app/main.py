@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from contextlib import asynccontextmanager
 from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 
 import structlog
 from fastapi import FastAPI, Request
@@ -17,11 +17,23 @@ from app.middleware.https_redirect import HTTPSRedirectMiddleware
 from app.middleware.security_headers import SecurityHeadersMiddleware
 from app.routers import (
     auth as auth_router,
+)
+from app.routers import (
     groups as groups_router,
+)
+from app.routers import (
     movies as movies_router,
+)
+from app.routers import (
     ratings as ratings_router,
+)
+from app.routers import (
     recommendations as recommendations_router,
+)
+from app.routers import (
     watchlist as watchlist_router,
+)
+from app.routers import (
     websocket as websocket_router,
 )
 from app.utils.logging import configure_logging

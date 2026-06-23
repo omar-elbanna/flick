@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
@@ -103,7 +103,7 @@ async def update_watchlist_item(
             detail={"detail": "Watchlist item not found.", "code": "WATCHLIST_NOT_FOUND"},
         )
     item.watched = payload.watched
-    item.watched_at = datetime.now(tz=timezone.utc) if payload.watched else None
+    item.watched_at = datetime.now(tz=UTC) if payload.watched else None
     await db.commit()
     movie = await db.get(Movie, item.movie_id)
     assert movie is not None

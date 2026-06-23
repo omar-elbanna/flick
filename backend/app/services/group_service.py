@@ -7,7 +7,7 @@ import secrets
 import string
 import uuid
 from collections import defaultdict
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 import structlog
@@ -568,7 +568,7 @@ async def maybe_finalize_session(db: AsyncSession, session: GroupSession) -> boo
         return False
     session.recommended_movie_id = winner_movie_id
     session.status = GroupSessionStatus.COMPLETED
-    session.completed_at = datetime.now(tz=timezone.utc)
+    session.completed_at = datetime.now(tz=UTC)
     await db.flush()
     return True
 
@@ -591,17 +591,17 @@ async def expire_session_if_overdue(db: AsyncSession, session_id: uuid.UUID) -> 
     session = await db.get(GroupSession, session_id)
     if session is None or session.status != GroupSessionStatus.ACTIVE:
         return False
-    age = datetime.now(tz=timezone.utc) - session.started_at
+    age = datetime.now(tz=UTC) - session.started_at
     if age < timedelta(seconds=SESSION_TIMEOUT_SECONDS):
         return False
     winner = await _resolve_winner(db, session_id)
     if winner is not None:
         session.recommended_movie_id = winner
         session.status = GroupSessionStatus.COMPLETED
-        session.completed_at = datetime.now(tz=timezone.utc)
+        session.completed_at = datetime.now(tz=UTC)
     else:
         session.status = GroupSessionStatus.EXPIRED
-        session.completed_at = datetime.now(tz=timezone.utc)
+        session.completed_at = datetime.now(tz=UTC)
     await db.commit()
     return True
 

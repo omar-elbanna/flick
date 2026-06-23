@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import json
 from typing import Any
 
@@ -63,10 +64,8 @@ async def _call(messages: list[dict[str, str]], json_response: bool) -> dict[str
                     resp.raise_for_status()
                 if resp.status_code >= 400:
                     err_body: dict[str, Any] = {}
-                    try:
+                    with contextlib.suppress(Exception):
                         err_body = resp.json().get("error", {}) or {}
-                    except Exception:
-                        pass
                     err_code = str(err_body.get("code") or "")
                     err_message = str(err_body.get("message") or "")
                     log.warning(

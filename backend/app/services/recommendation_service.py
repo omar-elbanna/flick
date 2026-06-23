@@ -227,7 +227,11 @@ async def _materialize_recommendations(
         try:
             claimed_title = str(entry.get("title") or "").strip()
             year_raw = entry.get("year")
-            year = int(year_raw) if isinstance(year_raw, (int, str)) and str(year_raw).isdigit() else None
+            year = (
+                int(year_raw)
+                if isinstance(year_raw, int | str) and str(year_raw).isdigit()
+                else None
+            )
             reasoning = str(entry.get("reasoning") or "").strip() or "Recommended for you."
         except (TypeError, ValueError):
             continue
@@ -245,7 +249,7 @@ async def _materialize_recommendations(
     )
     out: list[RecommendedMovie] = []
     seen_ids: set[int] = set()
-    for (_title, _year, reasoning), result in zip(queue, resolved):
+    for (_title, _year, reasoning), result in zip(queue, resolved, strict=False):
         if isinstance(result, BaseException) or result is None:
             continue
         movie = result

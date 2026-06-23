@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import uuid
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 from decimal import Decimal
 from typing import Any
 
@@ -43,7 +43,7 @@ async def fetch_and_cache_movie(tmdb_id: int, db: AsyncSession) -> Movie:
     ).scalar_one_or_none()
 
     if existing is not None:
-        age = datetime.now(tz=timezone.utc) - existing.cached_at
+        age = datetime.now(tz=UTC) - existing.cached_at
         if age.total_seconds() < 86400:
             return existing
 
@@ -71,7 +71,7 @@ async def _upsert_from_payload(
             tmdb_rating=_to_decimal(data.get("vote_average")),
             tmdb_vote_count=int(data.get("vote_count") or 0),
             original_language=data.get("original_language"),
-            cached_at=datetime.now(tz=timezone.utc),
+            cached_at=datetime.now(tz=UTC),
         )
         db.add(movie)
     else:
@@ -90,7 +90,7 @@ async def _upsert_from_payload(
         movie.original_language = data.get(
             "original_language", movie.original_language
         )
-        movie.cached_at = datetime.now(tz=timezone.utc)
+        movie.cached_at = datetime.now(tz=UTC)
     await db.flush()
     await db.commit()
     return movie

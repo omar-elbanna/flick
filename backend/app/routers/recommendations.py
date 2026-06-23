@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, Request
@@ -60,19 +61,17 @@ async def similar(
 
     primary_results: list[dict[str, Any]] = []
     seen_ids: set[int] = set()
-    try:
+    with contextlib.suppress(Exception):
         primary = await get_tmdb_recommendations(tmdb_id)
         for m in primary.get("results", []) or []:
             mid = m.get("id")
             if isinstance(mid, int) and mid not in seen_ids:
                 seen_ids.add(mid)
                 primary_results.append(m)
-    except Exception:
-        pass
 
     # Top up with /similar only if we have very few recommendations.
     if len(primary_results) < 12:
-        try:
+        with contextlib.suppress(Exception):
             fallback = await get_similar(tmdb_id)
             for m in fallback.get("results", []) or []:
                 mid = m.get("id")
@@ -81,8 +80,6 @@ async def similar(
                     primary_results.append(m)
                     if len(primary_results) >= 20:
                         break
-        except Exception:
-            pass
 
     return {
         "page": 1,

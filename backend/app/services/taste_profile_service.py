@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import uuid
 from collections import Counter, defaultdict
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from decimal import Decimal
 from typing import Any
 
@@ -66,7 +66,7 @@ async def compute_taste_profile(user_id: uuid.UUID, db: AsyncSession) -> UserTas
             select(UserTasteProfile).where(UserTasteProfile.user_id == user_id)
         )
     ).scalar_one_or_none()
-    now = datetime.now(tz=timezone.utc)
+    now = datetime.now(tz=UTC)
     if profile is None:
         profile = UserTasteProfile(
             user_id=user_id,

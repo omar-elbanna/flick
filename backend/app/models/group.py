@@ -10,11 +10,13 @@ from typing import TYPE_CHECKING
 from sqlalchemy import (
     Boolean,
     DateTime,
-    Enum as SAEnum,
     ForeignKey,
     String,
     UniqueConstraint,
     func,
+)
+from sqlalchemy import (
+    Enum as SAEnum,
 )
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -26,19 +28,19 @@ if TYPE_CHECKING:
     from app.models.user import User
 
 
-class GroupMemberRole(str, enum.Enum):
+class GroupMemberRole(enum.StrEnum):
     OWNER = "owner"
     MEMBER = "member"
 
 
-class GroupSessionStatus(str, enum.Enum):
+class GroupSessionStatus(enum.StrEnum):
     PENDING = "pending"
     ACTIVE = "active"
     COMPLETED = "completed"
     EXPIRED = "expired"
 
 
-class VoteChoice(str, enum.Enum):
+class VoteChoice(enum.StrEnum):
     YES = "yes"
     NO = "no"
     MAYBE = "maybe"
@@ -62,10 +64,10 @@ class Group(Base):
     )
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
-    members: Mapped[list["GroupMember"]] = relationship(
+    members: Mapped[list[GroupMember]] = relationship(
         back_populates="group", cascade="all, delete-orphan"
     )
-    sessions: Mapped[list["GroupSession"]] = relationship(
+    sessions: Mapped[list[GroupSession]] = relationship(
         back_populates="group", cascade="all, delete-orphan"
     )
 
@@ -104,7 +106,7 @@ class GroupMember(Base):
     )
 
     group: Mapped[Group] = relationship(back_populates="members")
-    user: Mapped["User"] = relationship(back_populates="memberships")
+    user: Mapped[User] = relationship(back_populates="memberships")
 
 
 class GroupSession(Base):
@@ -139,10 +141,10 @@ class GroupSession(Base):
     )
 
     group: Mapped[Group] = relationship(back_populates="sessions")
-    votes: Mapped[list["SessionVote"]] = relationship(
+    votes: Mapped[list[SessionVote]] = relationship(
         back_populates="session", cascade="all, delete-orphan"
     )
-    recommended_movie: Mapped["Movie | None"] = relationship()
+    recommended_movie: Mapped[Movie | None] = relationship()
 
 
 class SessionVote(Base):

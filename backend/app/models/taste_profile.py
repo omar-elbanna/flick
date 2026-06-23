@@ -8,7 +8,8 @@ from decimal import Decimal
 from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime, ForeignKey, Integer, Numeric
-from sqlalchemy.dialects.postgresql import JSONB, UUID as PGUUID
+from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -41,4 +42,4 @@ class UserTasteProfile(Base):
         DateTime(timezone=True), nullable=True
     )
 
-    user: Mapped["User"] = relationship(back_populates="taste_profile")
+    user: Mapped[User] = relationship(back_populates="taste_profile")

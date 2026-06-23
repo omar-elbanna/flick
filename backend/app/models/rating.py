@@ -59,5 +59,5 @@ class Rating(Base):
         nullable=False,
     )
 
-    user: Mapped["User"] = relationship(back_populates="ratings")
-    movie: Mapped["Movie"] = relationship()
+    user: Mapped[User] = relationship(back_populates="ratings")
+    movie: Mapped[Movie] = relationship()

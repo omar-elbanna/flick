@@ -45,19 +45,19 @@ class User(Base):
         nullable=False,
     )
 
-    refresh_tokens: Mapped[list["RefreshToken"]] = relationship(
+    refresh_tokens: Mapped[list[RefreshToken]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )
-    ratings: Mapped[list["Rating"]] = relationship(
+    ratings: Mapped[list[Rating]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )
-    watchlist: Mapped[list["WatchlistItem"]] = relationship(
+    watchlist: Mapped[list[WatchlistItem]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )
-    memberships: Mapped[list["GroupMember"]] = relationship(
+    memberships: Mapped[list[GroupMember]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )
-    taste_profile: Mapped["UserTasteProfile | None"] = relationship(
+    taste_profile: Mapped[UserTasteProfile | None] = relationship(
         back_populates="user", cascade="all, delete-orphan", uselist=False
     )
 

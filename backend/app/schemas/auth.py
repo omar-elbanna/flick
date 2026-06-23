@@ -37,7 +37,7 @@ class TokenResponse(BaseModel):
     model_config = _STRICT
 
     access_token: str
-    token_type: str = "bearer"
+    token_type: str = "bearer"  # noqa: S105 — not a password, OAuth2 spec literal
     expires_in: int
 
 

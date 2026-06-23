@@ -60,8 +60,8 @@ from sqlalchemy.ext.asyncio import (  # noqa: E402
 )
 
 import app.database as db_module  # noqa: E402
+from app import models as _models  # noqa: E402, F401 — registers tables on Base.metadata
 from app.database import Base  # noqa: E402
-from app import models  # noqa: E402 — register tables on metadata
 
 
 @pytest.fixture(scope="session")

@@ -46,5 +46,5 @@ class WatchlistItem(Base):
         DateTime(timezone=True), nullable=True
     )
 
-    user: Mapped["User"] = relationship(back_populates="watchlist")
-    movie: Mapped["Movie"] = relationship()
+    user: Mapped[User] = relationship(back_populates="watchlist")
+    movie: Mapped[Movie] = relationship()
