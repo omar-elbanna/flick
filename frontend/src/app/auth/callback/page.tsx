@@ -1,12 +1,12 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 
 import { fetchMeIfPossible } from "@/lib/auth";
 import { useAuthStore } from "@/store/auth-store";
 
-export default function OAuthCallbackPage() {
+function CallbackInner() {
   const router = useRouter();
   const params = useSearchParams();
 
@@ -21,4 +21,12 @@ export default function OAuthCallbackPage() {
   }, [params, router]);
 
   return <div className="text-center py-12">Signing you in…</div>;
+}
+
+export default function OAuthCallbackPage() {
+  return (
+    <Suspense fallback={<div className="text-center py-12">Signing you in…</div>}>
+      <CallbackInner />
+    </Suspense>
+  );
 }

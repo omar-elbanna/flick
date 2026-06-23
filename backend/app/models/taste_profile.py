@@ -7,10 +7,12 @@ from datetime import datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, ForeignKey, Integer, Numeric
+from sqlalchemy import JSON, DateTime, ForeignKey, Integer, Numeric
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+_JsonType = JSON().with_variant(JSONB(), "postgresql")
 
 from app.database import Base
 
@@ -31,12 +33,12 @@ class UserTasteProfile(Base):
         nullable=False,
     )
     genre_weights: Mapped[dict[str, float]] = mapped_column(
-        JSONB, nullable=False, default=dict
+        _JsonType, nullable=False, default=dict
     )
     avg_rating: Mapped[Decimal | None] = mapped_column(Numeric(3, 2), nullable=True)
     total_ratings: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     preferred_languages: Mapped[list[str]] = mapped_column(
-        JSONB, default=list, nullable=False
+        _JsonType, default=list, nullable=False
     )
     last_computed_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True

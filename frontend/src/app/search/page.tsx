@@ -1,11 +1,12 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
 import { MovieCard } from "@/components/movie-card";
 import { useMovieSearch } from "@/hooks/use-movies";
 
-export default function SearchPage() {
+function SearchResults() {
   const params = useSearchParams();
   const q = params.get("q") ?? "";
   const { data, isLoading, error } = useMovieSearch(q);
@@ -48,5 +49,13 @@ export default function SearchPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<p className="text-muted-foreground">Loading…</p>}>
+      <SearchResults />
+    </Suspense>
   );
 }

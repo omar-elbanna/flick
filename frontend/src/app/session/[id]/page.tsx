@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
 import { GroupSession } from "@/components/group-session";
 import { useSession } from "@/hooks/use-group";
 
-export default function SessionPage() {
+function SessionInner() {
   const params = useParams<{ id: string }>();
   const search = useSearchParams();
   const groupId = search.get("group") ?? undefined;
@@ -51,5 +52,13 @@ export default function SessionPage() {
       </Link>
       <GroupSession groupId={groupId} session={data} />
     </div>
+  );
+}
+
+export default function SessionPage() {
+  return (
+    <Suspense fallback={<p className="text-muted-foreground">Loading…</p>}>
+      <SessionInner />
+    </Suspense>
   );
 }
