@@ -43,7 +43,13 @@ async def fetch_and_cache_movie(tmdb_id: int, db: AsyncSession) -> Movie:
     ).scalar_one_or_none()
 
     if existing is not None:
-        age = datetime.now(tz=UTC) - existing.cached_at
+        # SQLite-safe: coerce naive datetimes to UTC for comparison.
+        cached_at = (
+            existing.cached_at
+            if existing.cached_at.tzinfo is not None
+            else existing.cached_at.replace(tzinfo=UTC)
+        )
+        age = datetime.now(tz=UTC) - cached_at
         if age.total_seconds() < 86400:
             return existing
 

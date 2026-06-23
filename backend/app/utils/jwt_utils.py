@@ -50,6 +50,12 @@ def _now() -> datetime:
     return datetime.now(tz=UTC)
 
 
+def _as_utc(dt: datetime) -> datetime:
+    """SQLite returns naive datetimes; coerce them to UTC-aware for comparison."""
+
+    return dt if dt.tzinfo is not None else dt.replace(tzinfo=UTC)
+
+
 def _hash_token(raw_token: str) -> str:
     return hashlib.sha256(raw_token.encode("utf-8")).hexdigest()
 
@@ -157,7 +163,7 @@ async def verify_and_rotate_refresh_token(
         log.warning("auth.token_theft_detected", family_id=str(record.family_id))
         raise TokenReuseError("refresh token reuse detected; family revoked")
 
-    if record.expires_at <= _now():
+    if _as_utc(record.expires_at) <= _now():
         raise TokenError("refresh token expired")
 
     user = await db.get(User, record.user_id)
