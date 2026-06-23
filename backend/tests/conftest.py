@@ -104,8 +104,14 @@ async def client(
         patch("app.routers.movies.search_movies", new_callable=AsyncMock) as tmdb_search,
         patch("app.routers.movies.get_trending", new_callable=AsyncMock) as tmdb_trending,
         patch("app.routers.movies.get_genres", new_callable=AsyncMock) as tmdb_genres,
-        patch("app.services.recommendation_service.call_with_retry", new_callable=AsyncMock) as openai_call,
-        patch("app.services.recommendation_service.search_movies", new_callable=AsyncMock) as reco_search,
+        patch(
+            "app.services.recommendation_service.call_with_retry",
+            new_callable=AsyncMock,
+        ) as openai_call,
+        patch(
+            "app.services.recommendation_service.search_movies",
+            new_callable=AsyncMock,
+        ) as reco_search,
         patch("app.utils.redis_client.get_redis", new_callable=AsyncMock) as redis_mock,
         patch("app.utils.redis_client.cache_get", new_callable=AsyncMock, return_value=None),
         patch("app.utils.redis_client.cache_set", new_callable=AsyncMock, return_value=None),
