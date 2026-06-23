@@ -15,4 +15,5 @@ limiter = Limiter(
     storage_uri=_storage_uri,
     default_limits=["100/minute"],
     headers_enabled=False,
+    enabled=not settings.is_test,
 )
