@@ -58,7 +58,7 @@ def _set_refresh_cookie(response: Response, raw_token: str) -> None:
         max_age=settings.REFRESH_TOKEN_TTL_DAYS * 24 * 60 * 60,
         httponly=True,
         secure=settings.is_production,
-        samesite="strict",
+        samesite="none" if settings.is_production else "lax",
         path="/api/v1/auth",
     )
 
