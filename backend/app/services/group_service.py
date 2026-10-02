@@ -41,7 +41,7 @@ from app.services.taste_profile_service import aggregate_group_taste
 
 log = structlog.get_logger(__name__)
 
-MIN_RATINGS_PER_MEMBER = 5
+MIN_RATINGS_PER_MEMBER = 3
 SESSION_TIMEOUT_SECONDS = 5 * 60
 _VOTE_POINTS: dict[VoteChoice, int] = {
     VoteChoice.YES: 2,

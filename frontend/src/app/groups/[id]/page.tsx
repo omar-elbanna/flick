@@ -12,10 +12,14 @@ import { useGroup, useStartSession } from "@/hooks/use-group";
 function extractError(err: unknown): string {
   if (err instanceof AxiosError) {
     const data = err.response?.data as
-      | { detail?: string | { detail?: string; code?: string } }
+      | { detail?: string | { detail?: string; code?: string; message?: string } }
       | undefined;
     if (typeof data?.detail === "string") return data.detail;
-    if (typeof data?.detail === "object" && data?.detail?.detail) return data.detail.detail;
+    if (typeof data?.detail === "object") {
+      if (data.detail?.detail) return data.detail.detail;
+      if (data.detail?.message) return data.detail.message;
+    }
+    if (err.message) return err.message;
   }
   return "Something went wrong.";
 }
@@ -68,7 +72,7 @@ export default function GroupDetailPage() {
             });
           }}
         >
-          {startSession.isPending ? "Picking movies…" : "Start a session"}
+          {startSession.isPending ? "Picking movies…" : "Recommend a movie"}
         </Button>
       </div>
 

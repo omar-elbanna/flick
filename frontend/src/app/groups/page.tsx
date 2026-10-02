@@ -34,7 +34,7 @@ export default function GroupsPage() {
       <header>
         <h1 className="text-3xl font-bold">Your groups</h1>
         <p className="text-muted-foreground mt-1">
-          Start a session — Flick picks 5 movies, your friends vote, the winner shows up.
+          Recommend a movie — Flick picks 5 movies, your friends vote, the winner shows up.
         </p>
       </header>
 
