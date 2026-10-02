@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import asyncio
 import json
 import re
 import uuid
@@ -242,17 +241,19 @@ async def _materialize_recommendations(
     if not queue:
         raise OpenAIError("AI returned no usable titles.")
 
-    # Resolve all titles in parallel via TMDB search.
-    resolved = await asyncio.gather(
-        *(_resolve_recommendation(title, year, db) for title, year, _ in queue),
-        return_exceptions=True,
-    )
+    # Resolve titles serially: _resolve_recommendation writes to `db`
+    # (fetch_and_cache_movie calls db.add), and SQLAlchemy's AsyncSession
+    # is not safe for concurrent use — gather'ing on the same session
+    # corrupts the flush pipeline and the whole TaskGroup crashes.
     out: list[RecommendedMovie] = []
     seen_ids: set[int] = set()
-    for (_title, _year, reasoning), result in zip(queue, resolved, strict=False):
-        if isinstance(result, BaseException) or result is None:
+    for claimed_title, year, reasoning in queue:
+        try:
+            movie = await _resolve_recommendation(claimed_title, year, db)
+        except Exception:
             continue
-        movie = result
+        if movie is None:
+            continue
         if movie.tmdb_id in seen_ids:
             continue
         seen_ids.add(movie.tmdb_id)
